@@ -1,4 +1,4 @@
-# data-portfolio
+# Data-Portfolio
 This repository provides a sample of data analysis projects I've worked on using SQL, R, Tableau, and other programs:
 
 Project | Description
