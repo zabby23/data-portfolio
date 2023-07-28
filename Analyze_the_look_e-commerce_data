@@ -1,0 +1,92 @@
+SELECT *  
+FROM `bigquery-public-data.thelook_ecommerce.order_items` 
+LIMIT 5;
+
+SELECT *
+FROM `bigquery-public-data.thelook_ecommerce.users`
+LIMIT 5;
+
+SELECT *
+FROM `bigquery-public-data.thelook_ecommerce.products`
+LIMIT 5;
+
+SELECT
+  oi.order_id, oi.user_id, oi.product_id, oi.sale_price,   
+  p.name, p.category, p.brand, p.department,
+  u.city, u.country, u.traffic_source 
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.products` p ON oi.product_id = p.id
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.users` u ON oi.user_id = u.id;
+
+SELECT 
+  COUNT(order_id) AS total_items_ordered, 
+  COUNT(DISTINCT order_id) AS total_number_of_orders
+FROM `bigquery-public-data.thelook_ecommerce.order_items`;
+
+SELECT 
+  DISTINCT product_id, 
+  COUNT(product_id) AS total_product_ordered,
+  p.name, p.brand, p.category, p.department
+FROM `bigquery-public-data.thelook_ecommerce.order_items`oi
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.products` p ON oi.product_id = p.id
+GROUP BY product_id, p.name, p.brand, p.category, p.department
+ORDER BY total_product_ordered DESC
+LIMIT 5;
+
+SELECT 
+  DISTINCT product_id, 
+  COUNT(product_id) AS total_product_ordered,
+  p.name, p.brand, p.category, p.department
+FROM `bigquery-public-data.thelook_ecommerce.order_items`oi
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.products` p ON oi.product_id = p.id
+GROUP BY product_id, p.name, p.brand, p.category, p.department
+ORDER BY total_product_ordered ASC
+LIMIT 5;
+
+SELECT DISTINCT traffic_source, COUNT(traffic_source) AS number_of_occurences
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY traffic_source
+ORDER BY number_of_occurences DESC;
+
+SELECT DISTINCT country, COUNT(country) AS number_of_users_in_country
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY country
+ORDER BY number_of_users_in_country DESC
+LIMIT 10;
+
+SELECT DISTINCT country, COUNT(country) AS number_of_users_in_country
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY country
+ORDER BY number_of_users_in_country ASC
+LIMIT 10;
+
+SELECT gender, COUNT(gender) AS total_people
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY gender;
+
+SELECT 
+  DISTINCT product_id, 
+  COUNT(product_id)*sale_price AS product_revenue,
+  p.name, p.brand, p.category, p.department,
+FROM `bigquery-public-data.thelook_ecommerce.order_items`oi
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.products` p ON oi.product_id = p.id
+GROUP BY product_id, p.name, p.brand, p.category, p.department, sale_price
+ORDER BY product_revenue DESC
+LIMIT 5;
+
+SELECT
+  product_id, COUNT(product_id), sale_price
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+GROUP BY product_id, sale_price
+ORDER BY sale_price DESC
+LIMIT 10;
+
+SELECT 
+  DISTINCT product_id, 
+  COUNT(product_id)*sale_price AS product_revenue,
+  p.name, p.brand, p.category, p.department,
+FROM `bigquery-public-data.thelook_ecommerce.order_items`oi
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.products` p ON oi.product_id = p.id
+GROUP BY product_id, p.name, p.brand, p.category, p.department, sale_price
+ORDER BY product_revenue ASC
+LIMIT 5;
