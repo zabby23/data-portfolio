@@ -1,0 +1,82 @@
+---
+title: "Regression Analysis"
+author: "Zach Abuel-Saud"
+date: "2023-07-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Data Set and Packages
+```{r}
+library(lfe)
+library(tidyverse)
+```
+
+```{r}
+library(doBy)
+library(ggplot2)
+library(knitr)
+library(stargazer)
+psdata <- read_csv("~/Downloads/Econ172_Spring 2021_ProblemSet3_data.csv")
+```
+
+```{r}
+totalmurders <- psdata$witch_murders + psdata$oth_murders 
+newdata <- cbind(psdata, totalmurders)
+
+stargazer(newdata, type="text", out="table1.txt")
+```
+Looking at the summary statistics for all the variables, the first thing that jumps out at me is that witch murders and non-witch murders have the same mean of 0.091 murders; I find this interesting because I wouldn’t expect witch murders and non-witch murders to have the same averages. The second thing that jumps out at me is the any_rain and famine variables having almost the same average, which makes sense because if there is drought or flooding, I’d expect some sort of famine to occur. It’s also interesting to me how often drought/flooding occurs, but it makes sense given the variability in rainfall in Sub-Saharan Africa.
+
+
+```{r}
+reg1 <- felm(oth_murders ~ any_rain |0|0|vid, data=psdata) 
+summary(reg1)
+```
+
+We can interpret the regression results as follows: first, the intercept reveals that when there is no flood- ing/drought, 0.0934 non-witch murders occur in a village in a particular year. Second, we can also see that when drought/flooding does occur, the occurrences of non-witch murders decreases by 0.0141 murders to 0.0793 murders. Additionally, the standard errors are clustered, with the any_rain coefficient’s standard error being 0.02422. Looking at the t values, we notice that the intercept is statistically significant, as the t-value is 5.210, but the any_rain variable isn’t statistically significant, as the t-value is -0.581.
+
+```{r}
+reg2 <- felm(oth_murders ~ any_rain + educat + trad_relig |0|0|vid, data=psdata)
+summary(reg2)
+```
+
+We can interpret the regression results as follows: first, the intercept reveals that the baseline occurrence for non-witch murders is roughly 0.0733 murders in a village in a particular year. Second, we also see that when drought/flooding occurs, the occurence of non-witch murders falls by 0.0123 murders to roughly 0.061 murders. Additionally, the standard errors are clustered, with the any_rain coefficient’s standard error being 0.0218. Third, we can interpret the explantory variable of average years of schooling as for every additional year of schooling, non-witch murders rise by roughly 0.007 murders. Lastly, we can interpret the explantory variable of the proportion of households in the village practicing traditional religions as when the proportion of households that practice traditional religions increases by 1, non-witch murders decline by 0.012. It’s also important to note that looking at all the variables and the intercept’s t values, we see that none of them are statistically significant.
+
+```{r}
+reg3 <- felm(oth_murders ~ any_disease |0|0|vid, data=psdata)
+summary(reg3)
+```
+
+We can interpret the regression results as follows: first, the intercept reveals that the baseline occurrence for non-witch murders is roughly 0.0893 murders in a village in a particular year. Second, we also see that when a disease outbreak occurs, the occurence of non-witch murders rises by 0.0116 murders to roughly 0.1009 murders. Additionally, the standard errors are clustered, with the any_disease coefficient’s standard error being 0.0368. Looking at the t-values, we see that the intercept is statistically significant, with a t-value of 4.922, while the any_disease variable is statistically insignificant, with a t-value of 0.315.
+
+```{r}
+reg4 <- felm(oth_murders ~ any_disease + educat + trad_relig |0|0|vid, data=psdata)
+summary(reg4)
+```
+
+We can interpret the regression results as follows: first, the intercept reveals that the baseline occurrence for non-witch murders is roughly 0.0691 murders in a village in a particular year. Second, we see that when a disease outbreak occurs, the occurences of non-witch murders rises by 0.0108 murders to roughly 0.0799 murders. Additionally, the standard errors are clustered, with the any_disease coefficient’s standard error being 0.037. Third, we can interpret the explanatory variable of average years of schooling as for every additional year of schooling, non-witch murders rise by roughly 0.007. Lastly, we can interpret the explanatory variable of the proportion of households in the village practicing traditional religions as when the proportion of households that practice traditional religions increases by 1, non-witch murders decline by 0.012. It’s important to note that looking at all the variables and the intercept’s t-values, we see that none of them are statistically significant.
+
+Contrasting these results to those in regressions 1 and 2, I notice something interesting. The explanatory variables of average years of schooling and the proportion of households that practice traditional religions have very similar effects in both regressions, whether drought/flooding occurs or a disease outbreak occurs; however, it’s also important to mention that for both regressions, the explanatory variables were statistically insignificant. Additionally, the any_rain variable in both regressions 1 and 2 show a negative effect (drought/flooding decreases the occurences of non-witch murders), while the any_disease variable in both regressions 3 and 4 show a positive effect (outbreaks increase the occurences of non-witch murders). Again though, neither of these variables are statistically significant.
+
+```{r}
+mydata_avg <- summaryBy(oth_murders ~ year, data=psdata) 
+rain_prop <- summaryBy(any_rain ~ year, data=psdata)
+
+op <- par(mar = c(5,4,4,4) + 0.1)
+plot(mydata_avg$year, mydata_avg$oth_murders.mean, col="RED", type="l", ann=FALSE) 
+par(new=TRUE)
+plot(mydata_avg$year, rain_prop$any_rain.mean, axes=FALSE, col="BLUE", type="l", ann=FALSE)
+axis(4)
+mtext("Proportion of Villages with Drought or Flooding", side=4, line=3)
+par(op)
+title(main="Non-Witch Murders and Drought/Flooding in Meatu District, Tanzania", xlab="Time (in years)") 
+legend("topleft", c("Non-Witch Murders", "Drought/Flooding"), fill=c("RED", "BLUE"))
+```
+
+Looking at the figure, I see a few patterns. First, from 1992 to just after 1996, I see that the red line (non-witch murders) has a positive slope and the blue line (drought/flooding) has a negative slope, and then shortly after the blue line starts to have a positive slope, the red line’s slope becomes negative. The next important pattern I see is from 1997 to around 2000, which shows both the blue line and the red line having steep and positive parallel slopes, and then steep negative parallel slopes. The final pattern I see is in 2001, when the blue line and the red line revert back to their first pattern of having opposite slopes, with the red line’s slope being positive and the blue line’s slope being negative.
+
+Overall, it’s interesting because at the beginning and end of the figure, non-witch murders rise as drought/flooding decreases, but then in the middle of the graph, both non-witch murders and flood- ing/drought rises, and then they both decrease. Because of this, I don’t think we can interpret the patterns as a causal relationship; in other words, the fact that the relationship between the two variables is much different in one chunk of the graph than in the other chunks of the graph could indicate that there could be an omitted variable, as perhaps in that period from 1997 to 2000, something else is occurring besides increasing flooding/drought that is causing an increase in non-witch murders (i.e. political unrest, crime, etc).
