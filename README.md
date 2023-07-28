@@ -3,4 +3,4 @@ This repository provides a sample of data analysis projects I've worked on using
 
 Project | Description
 ------- | -----------------
-[Analyze The Look E-Commerce Data](Link) | Wrote SQL queries regarding e-commerce data of an apparel company, figuring out sales performance, consumer data, etc. |
+[Analyze The Look E-Commerce Data]([https://github.com/zabby23/data-portfolio/tree/main/Analyze_The_Look_Ecommerce_Data]) | Wrote SQL queries regarding e-commerce data of an apparel company, figuring out sales performance, consumer data, etc. |
